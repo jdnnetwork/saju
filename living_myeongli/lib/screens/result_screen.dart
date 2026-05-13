@@ -10,6 +10,7 @@ import '../services/supabase_service.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/score_bar.dart';
 import 'feedback_screen.dart';
+import 'home_dashboard_screen.dart';
 
 class ResultScreen extends StatefulWidget {
   const ResultScreen({
@@ -73,6 +74,21 @@ class _ResultScreenState extends State<ResultScreen> {
             child: child,
           ),
         ),
+      ),
+    );
+  }
+
+  void _onManageMyeongli() {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 500),
+        pageBuilder: (_, _, _) => HomeDashboardScreen(
+          elementScores: _result.elementScores,
+          characterName: _result.top.character.name,
+          characterCode: _result.top.code,
+        ),
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
       ),
     );
   }
@@ -146,7 +162,10 @@ class _ResultScreenState extends State<ResultScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                _FeedbackButton(onTap: _onFeedback),
+                _PrimaryCTAButton(onTap: _onManageMyeongli),
+                const SizedBox(height: 8),
+                _SecondaryFeedbackButton(onTap: _onFeedback),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -429,15 +448,15 @@ class _ShadowCard extends StatelessWidget {
   }
 }
 
-class _FeedbackButton extends StatefulWidget {
-  const _FeedbackButton({required this.onTap});
+class _PrimaryCTAButton extends StatefulWidget {
+  const _PrimaryCTAButton({required this.onTap});
   final VoidCallback onTap;
 
   @override
-  State<_FeedbackButton> createState() => _FeedbackButtonState();
+  State<_PrimaryCTAButton> createState() => _PrimaryCTAButtonState();
 }
 
-class _FeedbackButtonState extends State<_FeedbackButton> {
+class _PrimaryCTAButtonState extends State<_PrimaryCTAButton> {
   bool _pressed = false;
 
   @override
@@ -451,26 +470,61 @@ class _FeedbackButtonState extends State<_FeedbackButton> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 150),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          width: double.infinity,
+          height: 56,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [AppColors.primary, Color(0xFF2D5A8B)],
+              colors: [Color(0xFF9C7CB8), Color(0xFFD4A0B0)],
             ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: const [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
+                color: Color(0x339C7CB8),
                 blurRadius: 20,
-                spreadRadius: -2,
-                offset: const Offset(0, 8),
+                offset: Offset(0, 8),
               ),
             ],
           ),
-          child: Text(
-            '📝  피드백 남기기',
-            style: AppText.body(size: 16, color: Colors.white)
-                .copyWith(fontWeight: FontWeight.w800, letterSpacing: 0.5),
+          child: const Text(
+            '✨ 내 사주명리 관리하기',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        )
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(
+              duration: 2000.ms,
+              color: Colors.white.withOpacity(0.3),
+            ),
+      ),
+    );
+  }
+}
+
+class _SecondaryFeedbackButton extends StatelessWidget {
+  const _SecondaryFeedbackButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: double.infinity,
+        height: 44,
+        alignment: Alignment.center,
+        color: Colors.transparent,
+        child: const Text(
+          '📝 베타 피드백 남기기',
+          style: TextStyle(
+            color: Color(0xFF888888),
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),
