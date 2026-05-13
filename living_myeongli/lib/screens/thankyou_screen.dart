@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../config/theme.dart';
 import '../models/character.dart';
+import '../utils/sound.dart';
 import '../widgets/glass_card.dart';
 import 'splash_screen.dart';
 
@@ -12,6 +13,7 @@ class ThankYouScreen extends StatelessWidget {
   final Character topCharacter;
 
   void _toStart(BuildContext context) {
+    playClickSound();
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 500),

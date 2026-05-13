@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../config/theme.dart';
 import '../data/questions.dart';
 import '../models/question.dart';
+import '../utils/sound.dart';
 import '../widgets/forced_option.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/image_option.dart';
@@ -106,6 +107,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
   }
 
   void _onBack() {
+    playClickSound();
     if (_index == 0) {
       Navigator.of(context).pop();
       return;
@@ -347,7 +349,12 @@ class _QuestionCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: selectedDisplayIndex == null ? null : onScaleConfirm,
+                onPressed: selectedDisplayIndex == null
+                    ? null
+                    : () {
+                        playClickSound();
+                        onScaleConfirm();
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,

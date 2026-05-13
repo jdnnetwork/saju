@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/theme.dart';
 import '../models/character.dart';
 import '../services/supabase_service.dart';
+import '../utils/sound.dart';
 import '../widgets/glass_card.dart';
 import 'thankyou_screen.dart';
 
@@ -46,6 +47,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   Future<void> _submit() async {
     if (!_canSubmit) return;
+    playClickSound();
     setState(() {
       _submitting = true;
       _error = null;
@@ -95,7 +97,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           title: const Text('생활명리'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              playClickSound();
+              Navigator.of(context).pop();
+            },
           ),
         ),
         body: SafeArea(
@@ -247,7 +252,10 @@ class _StarRow extends StatelessWidget {
           children: [
             for (var i = 1; i <= 5; i++)
               GestureDetector(
-                onTap: () => onChanged(i),
+                onTap: () {
+                  playClickSound();
+                  onChanged(i);
+                },
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),

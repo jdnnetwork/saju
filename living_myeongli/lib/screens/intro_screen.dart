@@ -2,9 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../config/theme.dart';
-import '../widgets/glass_card.dart';
+import '../utils/sound.dart';
 import 'result_screen.dart';
 import 'survey_screen.dart';
 
@@ -15,19 +15,38 @@ class IntroScreen extends StatefulWidget {
   State<IntroScreen> createState() => _IntroScreenState();
 }
 
-class _IntroScreenState extends State<IntroScreen> {
+class _IntroScreenState extends State<IntroScreen>
+    with SingleTickerProviderStateMixin {
   late final int _respondentNumber;
+  late final AnimationController _floatController;
+  late final Animation<double> _floatAnimation;
 
   @override
   void initState() {
     super.initState();
     _respondentNumber = 1000 + math.Random().nextInt(9000);
+
+    _floatController = AnimationController(
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _floatAnimation = Tween<double>(begin: 0.0, end: -16.0).animate(
+      CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _floatController.dispose();
+    super.dispose();
   }
 
   void _onStart() {
+    playClickSound();
     Navigator.of(context).push(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 350),
+        transitionDuration: const Duration(milliseconds: 500),
         pageBuilder: (_, _, _) => SurveyScreen(
           respondentNumber: _respondentNumber,
           onComplete: (result) {
@@ -45,165 +64,301 @@ class _IntroScreenState extends State<IntroScreen> {
             );
           },
         ),
-        transitionsBuilder: (_, anim, _, child) => FadeTransition(
-          opacity: anim,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0.05, 0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
-            child: child,
-          ),
-        ),
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
+    final bp = MediaQuery.of(context).padding.bottom;
+
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: _bg(),
+        child: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              _topText(sh),
+              _orbSection(sw, sh),
+              _ctaButton(sw, bp),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // 배경 그라데이션
+  // ────────────────────────────────────────────────────────────
+  BoxDecoration _bg() {
+    return const BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color(0xFFF5EEF8),
+          Color(0xFFF2ECF5),
+          Color(0xFFEDE5F0),
+          Color(0xFFF0E8EF),
+          Color(0xFFEDE8F0),
+        ],
+        stops: [0.0, 0.25, 0.5, 0.75, 1.0],
+      ),
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // 상단 텍스트 영역
+  // ────────────────────────────────────────────────────────────
+  Widget _topText(double sh) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        children: [
+          SizedBox(height: sh * 0.07),
+          Text(
+            '생활 명리',
+            style: GoogleFonts.notoSansKr(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF8B6CAF),
+              letterSpacing: 4,
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 600.ms, delay: 200.ms)
+              .slideY(
+                begin: -0.3,
+                end: 0,
+                duration: 600.ms,
+                delay: 200.ms,
+                curve: Curves.easeOutCubic,
+              ),
+          const SizedBox(height: 20),
+          Text(
+            '나는 어떤\n사람일까?',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansKr(
+              fontSize: 38,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF1A1A2E),
+              height: 1.25,
+              letterSpacing: -0.5,
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 700.ms, delay: 400.ms)
+              .slideY(
+                begin: 0.2,
+                end: 0,
+                duration: 700.ms,
+                delay: 400.ms,
+                curve: Curves.easeOutCubic,
+              ),
+          const SizedBox(height: 24),
+          Text(
+            '2분 설문 조사로\n나의 현재와 미래를 파악하세요',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansKr(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF555555),
+              height: 1.6,
+            ),
+          )
+              .animate()
+              .fadeIn(duration: 600.ms, delay: 600.ms)
+              .slideY(
+                begin: 0.2,
+                end: 0,
+                duration: 600.ms,
+                delay: 600.ms,
+                curve: Curves.easeOutCubic,
+              ),
+        ],
+      ),
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // 중앙 구체 + 받침대
+  // ────────────────────────────────────────────────────────────
+  Widget _orbSection(double sw, double sh) {
+    return Expanded(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // 반짝이는 점 4개
+          Positioned(
+            left: sw * 0.12,
+            top: 30,
+            child: _sparkle(5.0, const Color(0x50FFFFFF), 0),
+          ),
+          Positioned(
+            right: sw * 0.15,
+            top: 50,
+            child: _sparkle(4.0, const Color(0x40FFFFFF), 800),
+          ),
+          Positioned(
+            left: sw * 0.08,
+            bottom: 100,
+            child: _sparkle(3.0, const Color(0x35FFFFFF), 1600),
+          ),
+          Positioned(
+            right: sw * 0.10,
+            bottom: 80,
+            child: _sparkle(6.0, const Color(0x45FFFFFF), 2400),
+          ),
+
+          // 구체 + 받침대
+          GestureDetector(
+            onTap: () => playClickSound(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedBuilder(
+                  animation: _floatAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, _floatAnimation.value),
+                      child: child,
+                    );
+                  },
+                  child: Image.asset(
+                    'asset/image/gu.png',
+                    width: sw * 0.58,
+                    fit: BoxFit.contain,
+                  ),
+                )
+                    .animate()
+                    .fadeIn(duration: 800.ms, delay: 500.ms)
+                    .scale(
+                      begin: const Offset(0.8, 0.8),
+                      end: const Offset(1.0, 1.0),
+                      duration: 800.ms,
+                      delay: 500.ms,
+                      curve: Curves.easeOutBack,
+                    ),
+                Transform.translate(
+                  offset: const Offset(0, -25),
+                  child: Image.asset(
+                    'asset/image/bat.png',
+                    width: sw * 0.65,
+                    fit: BoxFit.contain,
+                  ),
+                ).animate().fadeIn(duration: 600.ms, delay: 700.ms),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sparkle(double size, Color color, int delayMs) {
     return Container(
-      decoration: const BoxDecoration(gradient: AppGradients.pastel),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(title: const Text('생활명리')),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Center(
-              child: GlassCard(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '나는 어떤 사람인가',
-                      style: AppText.title(size: 28),
-                      textAlign: TextAlign.center,
-                    )
-                        .animate()
-                        .fadeIn(duration: 500.ms)
-                        .slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
-                    const SizedBox(height: 16),
-                    Text(
-                      '오행과 계절의 조합으로\n당신만의 운명 캐릭터를 찾아드립니다',
-                      style: AppText.body(size: 15, color: AppColors.textSecondary),
-                      textAlign: TextAlign.center,
-                    ).animate().fadeIn(delay: 200.ms, duration: 500.ms),
-                    const SizedBox(height: 32),
-                    _MetaRow(
-                      items: const [
-                        ('📱', '18문항'),
-                        ('⏱', '약 3~4분'),
-                      ],
-                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '참가자 #${_respondentNumber.toString().padLeft(4, '0')}',
-                        style: AppText.caption(size: 13, color: AppColors.primary)
-                            .copyWith(fontWeight: FontWeight.w700, letterSpacing: 1),
-                      ),
-                    ).animate().fadeIn(delay: 500.ms, duration: 500.ms),
-                    const SizedBox(height: 36),
-                    _StartButton(onPressed: _onStart)
-                        .animate()
-                        .fadeIn(delay: 600.ms, duration: 500.ms)
-                        .slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.6),
+            blurRadius: size * 3,
+            spreadRadius: size * 0.5,
+          ),
+        ],
+      ),
+    )
+        .animate(onPlay: (c) => c.repeat(reverse: true))
+        .fadeIn(duration: 2000.ms, delay: delayMs.ms)
+        .scale(
+          begin: const Offset(0.7, 0.7),
+          end: const Offset(1.3, 1.3),
+          duration: 4000.ms,
+          delay: delayMs.ms,
+        );
+  }
+
+  // ────────────────────────────────────────────────────────────
+  // 하단 CTA
+  // ────────────────────────────────────────────────────────────
+  Widget _ctaButton(double sw, double bp) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, 0, 24, bp + 36),
+      child: GestureDetector(
+        onTap: _onStart,
+        child: Stack(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 60,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color(0xFFA78BBF),
+                    Color(0xFFCC95A8),
+                    Color(0xFFD4A0B0),
                   ],
+                  stops: [0.0, 0.5, 1.0],
+                ),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x40A78BBF),
+                    blurRadius: 24,
+                    offset: Offset(0, 10),
+                    spreadRadius: -4,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  '2분 설문 조사 해보기',
+                  style: GoogleFonts.notoSansKr(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.items});
-  final List<(String, String)> items;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < items.length; i++) ...[
-          if (i > 0)
-            Container(
-              width: 1,
-              height: 16,
-              color: AppColors.textSecondary.withOpacity(0.3),
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-            ),
-          Text(
-            '${items[i].$1}  ${items[i].$2}',
-            style: AppText.body(size: 14, color: AppColors.textSecondary),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-class _StartButton extends StatefulWidget {
-  const _StartButton({required this.onPressed});
-  final VoidCallback onPressed;
-
-  @override
-  State<_StartButton> createState() => _StartButtonState();
-}
-
-class _StartButtonState extends State<_StartButton> {
-  bool _pressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTap: widget.onPressed,
-      child: AnimatedScale(
-        scale: _pressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOut,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, Color(0xFF2D5A8B)],
-            ),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
-                blurRadius: 20,
-                spreadRadius: -2,
-                offset: const Offset(0, 8),
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Container(color: Colors.transparent)
+                    .animate(onPlay: (c) => c.repeat())
+                    .shimmer(
+                      duration: 2500.ms,
+                      delay: 1500.ms,
+                      color: Colors.white.withOpacity(0.12),
+                    ),
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '시작하기',
-                style: AppText.body(size: 17, color: Colors.white)
-                    .copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.5),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_forward, color: Colors.white, size: 20),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
+      )
+          .animate()
+          .fadeIn(duration: 600.ms, delay: 900.ms)
+          .slideY(
+            begin: 0.3,
+            end: 0,
+            duration: 600.ms,
+            delay: 900.ms,
+            curve: Curves.easeOutCubic,
+          ),
     );
   }
 }

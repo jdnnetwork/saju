@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
 import '../models/question.dart';
+import '../utils/sound.dart';
 
 class ForcedOption extends StatefulWidget {
   const ForcedOption({
@@ -32,7 +33,10 @@ class _ForcedOptionState extends State<ForcedOption> {
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) => setState(() => _pressed = false),
       onTapCancel: () => setState(() => _pressed = false),
-      onTap: widget.onTap,
+      onTap: () {
+        playClickSound();
+        widget.onTap();
+      },
       child: AnimatedScale(
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 150),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
+import '../utils/sound.dart';
 
 class ScaleSlider extends StatefulWidget {
   const ScaleSlider({
@@ -96,7 +97,11 @@ class _ScaleSliderState extends State<ScaleSlider>
             min: 0,
             max: (widget.labels.length - 1).toDouble(),
             divisions: widget.labels.length - 1,
-            onChanged: (val) => widget.onChanged(val.round()),
+            onChanged: (val) {
+              final next = val.round();
+              if (next != v) playClickSound();
+              widget.onChanged(next);
+            },
           ),
         ),
         const SizedBox(height: 4),

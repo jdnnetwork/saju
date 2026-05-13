@@ -7,6 +7,7 @@ import '../data/questions.dart';
 import '../models/character.dart';
 import '../services/scoring_service.dart';
 import '../services/supabase_service.dart';
+import '../utils/sound.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/score_bar.dart';
 import 'feedback_screen.dart';
@@ -57,6 +58,7 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   void _onFeedback() {
+    playClickSound();
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 350),
@@ -79,6 +81,7 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   void _onManageMyeongli() {
+    playClickSound();
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 500),

@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../utils/sound.dart';
+
 class HomeDashboardScreen extends StatelessWidget {
   final Map<String, double> elementScores;
   final String characterName;
@@ -132,7 +134,7 @@ class _TopBar extends StatelessWidget {
           ),
           const Spacer(),
           GestureDetector(
-            onTap: () {},
+            onTap: () => playClickSound(),
             child: Row(
               children: [
                 Container(
@@ -333,7 +335,7 @@ class _Hero extends StatelessWidget {
                     .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
                 const SizedBox(height: 24),
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () => playClickSound(),
                   child: Container(
                     width: 200,
                     height: 50,
@@ -875,7 +877,7 @@ class _JourneyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () => playClickSound(),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
@@ -965,7 +967,7 @@ class _RecordSpace extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             GestureDetector(
-              onTap: () {},
+              onTap: () => playClickSound(),
               child: Container(
                 width: 48,
                 height: 48,
@@ -1056,7 +1058,7 @@ class _NavTab extends StatelessWidget {
     final color = active ? const Color(0xFF9C7CB8) : const Color(0xFFBBBBBB);
     return Expanded(
       child: GestureDetector(
-        onTap: () {},
+        onTap: () => playClickSound(),
         behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
