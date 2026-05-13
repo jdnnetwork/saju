@@ -17,93 +17,66 @@ class HomeDashboardScreen extends StatelessWidget {
     required this.characterCode,
   });
 
+  // ─────────────────────────────────────────────
+  //  build
+  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFF3EBF9),
-            Color(0xFFEBF0F9),
-            Color(0xFFF9EBF3),
-            Color(0xFFF5F0FA),
-          ],
-          stops: [0.0, 0.3, 0.7, 1.0],
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFFF3EBF9),
+              Color(0xFFEBF0F9),
+              Color(0xFFF9EBF3),
+              Color(0xFFF5F0FA),
+            ],
+            stops: [0.0, 0.3, 0.7, 1.0],
+          ),
         ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  const _TopBar()
-                      .animate()
-                      .fadeIn(duration: 300.ms),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _Hero(
-                            elementScores: elementScores,
-                            characterName: characterName,
-                            characterCode: characterCode,
-                          ),
-                          const _FortuneCard()
-                              .animate()
-                              .fadeIn(delay: 300.ms, duration: 400.ms)
-                              .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
-                          _TwoColumnGrid(elementScores: elementScores)
-                              .animate()
-                              .fadeIn(delay: 400.ms, duration: 400.ms)
-                              .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
-                          const _Journey()
-                              .animate()
-                              .fadeIn(delay: 500.ms, duration: 400.ms)
-                              .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
-                          const _RecordSpace()
-                              .animate()
-                              .fadeIn(delay: 600.ms, duration: 400.ms)
-                              .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
-                          const SizedBox(height: 100),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+        child: SafeArea(
+          child: Stack(
+            children: [
+              // ────── 레이어 1: 스크롤 콘텐츠 ──────
+              SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildAppBar(),
+                    _buildHero(),
+                    _buildFortuneCard(),
+                    _buildTwoColumnGrid(),
+                    _buildJourney(),
+                    _buildRecordSpace(),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: const _BottomNav()
-                  .animate()
-                  .fadeIn(delay: 400.ms, duration: 300.ms)
-                  .slideY(begin: 0.5, end: 0, curve: Curves.easeOutCubic),
-            ),
-          ],
+              // ────── 레이어 2: 하단 네비바 ──────
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _buildBottomNav(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────
-// 섹션 1: 상단 앱바
-// ─────────────────────────────────────────────────────────────
-class _TopBar extends StatelessWidget {
-  const _TopBar();
-
-  @override
-  Widget build(BuildContext context) {
+  // ─────────────────────────────────────────────
+  //  1. 상단 앱바
+  // ─────────────────────────────────────────────
+  Widget _buildAppBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: Row(
         children: [
           Container(
@@ -128,21 +101,23 @@ class _TopBar extends StatelessWidget {
             '생활 명리',
             style: TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
               color: Color(0xFF9C7CB8),
             ),
           ),
           const Spacer(),
           GestureDetector(
             onTap: () => playClickSound(),
+            behavior: HitTestBehavior.opaque,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
                   width: 36,
                   height: 36,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    gradient: const LinearGradient(
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
                       colors: [Color(0xFFE8C4D8), Color(0xFFD4B8E0)],
                     ),
                   ),
@@ -183,32 +158,19 @@ class _TopBar extends StatelessWidget {
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────
-// 섹션 2: 히어로 카드
-// ─────────────────────────────────────────────────────────────
-class _Hero extends StatelessWidget {
-  final Map<String, double> elementScores;
-  final String characterName;
-  final String characterCode;
-
-  const _Hero({
-    required this.elementScores,
-    required this.characterName,
-    required this.characterCode,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  // ─────────────────────────────────────────────
+  //  2. 히어로 — 좌측 텍스트 + 우측 장식
+  //     (예외적으로 내부 Stack 허용)
+  // ─────────────────────────────────────────────
+  Widget _buildHero() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: SizedBox(
-        height: 340,
+        height: 300,
         child: Stack(
-          clipBehavior: Clip.none,
           children: [
-            // 오른쪽 장식 — 글래스 느낌 원들
+            // 우측 장식 — 큰 원
             Positioned(
               right: -20,
               top: 10,
@@ -231,19 +193,19 @@ class _Hero extends StatelessWidget {
                 ),
               ),
             ),
+            // 우측 장식 — 중간 원
             Positioned(
               right: 10,
-              top: 50,
+              top: 60,
               child: Container(
-                width: 100,
-                height: 100,
+                width: 90,
+                height: 90,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: const RadialGradient(
                     colors: [
                       Color(0x30E8D5F5),
                       Color(0x18D5E8F5),
-                      Color(0x08F5D5E8),
                     ],
                   ),
                   border: Border.all(
@@ -253,46 +215,7 @@ class _Hero extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              right: 60,
-              top: 20,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const RadialGradient(
-                    colors: [
-                      Color(0x20E8D5F5),
-                      Color(0x10D5E8F5),
-                    ],
-                  ),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: -30,
-              top: 30,
-              child: Transform.rotate(
-                angle: -0.3,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: const Color(0x30B8A0D0),
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // 좌측 텍스트 영역
+            // 좌측 텍스트 + CTA
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -300,7 +223,7 @@ class _Hero extends StatelessWidget {
                   '오늘의 나',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF9C7CB8),
                   ),
                 )
@@ -318,22 +241,21 @@ class _Hero extends StatelessWidget {
                   ),
                 )
                     .animate()
-                    .fadeIn(delay: 100.ms, duration: 400.ms)
+                    .fadeIn(delay: 150.ms, duration: 400.ms)
                     .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
                 const SizedBox(height: 12),
                 const Text(
                   '명리는 나를 이해하는\n또 하나의 따뜻한 언어입니다.',
                   style: TextStyle(
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
                     color: Color(0xFF888888),
                     height: 1.6,
                   ),
                 )
                     .animate()
-                    .fadeIn(delay: 100.ms, duration: 400.ms)
+                    .fadeIn(delay: 200.ms, duration: 400.ms)
                     .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () => playClickSound(),
                   child: Container(
@@ -362,7 +284,7 @@ class _Hero extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         SizedBox(width: 6),
@@ -376,7 +298,7 @@ class _Hero extends StatelessWidget {
                   ),
                 )
                     .animate()
-                    .fadeIn(delay: 200.ms, duration: 400.ms)
+                    .fadeIn(delay: 250.ms, duration: 400.ms)
                     .slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
               ],
             ),
@@ -385,20 +307,15 @@ class _Hero extends StatelessWidget {
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────
-// 섹션 3: 오늘의 운세 요약 카드
-// ─────────────────────────────────────────────────────────────
-class _FortuneCard extends StatelessWidget {
-  const _FortuneCard();
-
-  @override
-  Widget build(BuildContext context) {
+  // ─────────────────────────────────────────────
+  //  3. 오늘의 운세 요약 카드
+  // ─────────────────────────────────────────────
+  Widget _buildFortuneCard() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.6),
           borderRadius: BorderRadius.circular(20),
@@ -411,118 +328,69 @@ class _FortuneCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Stack(
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Row(
-                  children: [
-                    Text('✦', style: TextStyle(fontSize: 14, color: Color(0xFF9C7CB8))),
-                    SizedBox(width: 6),
-                    Text(
-                      '오늘의 운세 요약',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF9C7CB8),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
+                Text('✦', style: TextStyle(fontSize: 14, color: Color(0xFF9C7CB8))),
+                SizedBox(width: 6),
                 Text(
-                  '흐름을 믿고, 한 걸음 더 나아가세요.',
+                  '오늘의 운세 요약',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF2D2D2D),
-                    height: 1.4,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '작은 선택이 내일을 바꿉니다.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF888888),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF9C7CB8),
                   ),
                 ),
               ],
             ),
-            Positioned(
-              right: 0,
-              bottom: 0,
-              child: SizedBox(
-                width: 80,
-                height: 80,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0x20F5C4A0),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 35,
-                      bottom: 30,
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color(0x30E8A080),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            SizedBox(height: 14),
+            Text(
+              '흐름을 믿고, 한 걸음 더 나아가세요.',
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2D2D2D),
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 6),
+            Text(
+              '작은 선택이 내일을 바꿉니다.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF888888),
               ),
             ),
           ],
         ),
-      ),
+      )
+          .animate()
+          .fadeIn(delay: 300.ms, duration: 400.ms)
+          .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────
-// 섹션 4: 2열 그리드 — 오늘의 키워드 + 나의 사주 오행
-// ─────────────────────────────────────────────────────────────
-class _TwoColumnGrid extends StatelessWidget {
-  final Map<String, double> elementScores;
-  const _TwoColumnGrid({required this.elementScores});
-
-  @override
-  Widget build(BuildContext context) {
+  // ─────────────────────────────────────────────
+  //  4. 2열 그리드 — 키워드 + 오행
+  // ─────────────────────────────────────────────
+  Widget _buildTwoColumnGrid() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Expanded(child: _KeywordCard()),
+          Expanded(child: _keywordCard()),
           const SizedBox(width: 12),
-          Expanded(child: _ElementsCard(elementScores: elementScores)),
+          Expanded(child: _elementsCard()),
         ],
       ),
     );
   }
-}
 
-class _KeywordCard extends StatelessWidget {
-  const _KeywordCard();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _keywordCard() {
     return Container(
-      height: 200,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
@@ -536,118 +404,64 @@ class _KeywordCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Stack(
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Row(
-                children: [
-                  Text(
-                    '오늘의 키워드',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF555555),
-                    ),
-                  ),
-                  Spacer(),
-                  Icon(Icons.info_outline, size: 14, color: Color(0xFFCCCCCC)),
-                ],
-              ),
-              SizedBox(height: 20),
+          Row(
+            children: [
               Text(
-                '성장 · 균형 · 표현',
+                '오늘의 키워드',
                 style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF2D2D2D),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF555555),
                 ),
               ),
+              Spacer(),
+              Icon(Icons.info_outline, size: 14, color: Color(0xFFCCCCCC)),
             ],
           ),
-          // 잎사귀 장식 — 3개의 회전된 모양
-          Positioned(
-            right: -10,
-            bottom: -10,
-            child: SizedBox(
-              width: 120,
-              height: 110,
-              child: Stack(
-                children: [
-                  Positioned(
-                    right: 50,
-                    bottom: 0,
-                    child: Transform.rotate(
-                      angle: -15 * math.pi / 180,
-                      child: Container(
-                        width: 35,
-                        height: 70,
-                        decoration: const BoxDecoration(
-                          color: Color(0x15A0C4A8),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(20),
-                            bottomLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 25,
-                    bottom: 0,
-                    child: Container(
-                      width: 50,
-                      height: 80,
-                      decoration: const BoxDecoration(
-                        color: Color(0x20B8D4C0),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(40),
-                          topRight: Radius.circular(20),
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Transform.rotate(
-                      angle: 15 * math.pi / 180,
-                      child: Container(
-                        width: 30,
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          color: Color(0x10C8E0D0),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(40),
-                            topRight: Radius.circular(20),
-                            bottomLeft: Radius.circular(8),
-                            bottomRight: Radius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          SizedBox(height: 16),
+          Text(
+            '성장',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF2D2D2D),
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            '균형',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF2D2D2D),
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            '표현',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF2D2D2D),
+            ),
+          ),
+          SizedBox(height: 16),
+          Text(
+            '오늘 따라가야 할 흐름',
+            style: TextStyle(
+              fontSize: 11,
+              color: Color(0xFF999999),
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _ElementsCard extends StatelessWidget {
-  final Map<String, double> elementScores;
-  const _ElementsCard({required this.elementScores});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _elementsCard() {
     const items = [
       ('목', 'WO', Color(0xFF4CAF50)),
       ('화', 'FI', Color(0xFFE57373)),
@@ -661,7 +475,6 @@ class _ElementsCard extends StatelessWidget {
     final maxVal = maxRaw > 0 ? maxRaw : 1.0;
 
     return Container(
-      height: 200,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
@@ -692,7 +505,7 @@ class _ElementsCard extends StatelessWidget {
               Icon(Icons.info_outline, size: 14, color: Color(0xFFCCCCCC)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           for (var i = 0; i < items.length; i++)
             _ElementBar(
               label: items[i].$1,
@@ -704,8 +517,245 @@ class _ElementsCard extends StatelessWidget {
       ),
     );
   }
+
+  // ─────────────────────────────────────────────
+  //  5. 명리 여정 (4개 아이콘 카드)
+  // ─────────────────────────────────────────────
+  Widget _buildJourney() {
+    const items = [
+      (Icons.person_outline, Color(0xFFEDE7F6), Color(0xFF7E57C2), '나의 성향\n분석'),
+      (Icons.people_outline, Color(0xFFFCE4EC), Color(0xFFE57373), '관계의\n흐름'),
+      (Icons.calendar_today_outlined, Color(0xFFE8F5E9), Color(0xFF66BB6A), '올해의\n운세'),
+      (Icons.assessment_outlined, Color(0xFFE3F2FD), Color(0xFF42A5F5), '운세\n리포트'),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '명리 여정',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2D2D2D),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(
+                  child: _journeyCard(
+                    icon: items[i].$1,
+                    bgColor: items[i].$2,
+                    iconColor: items[i].$3,
+                    label: items[i].$4,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _journeyCard({
+    required IconData icon,
+    required Color bgColor,
+    required Color iconColor,
+    required String label,
+  }) {
+    return GestureDetector(
+      onTap: () => playClickSound(),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.white.withOpacity(0.7), width: 1),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, size: 22, color: iconColor),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF555555),
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  //  6. 나만의 기록 공간
+  // ─────────────────────────────────────────────
+  Widget _buildRecordSpace() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.6), width: 1),
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Colors.white.withOpacity(0.5),
+              const Color(0xFFF0EAFA).withOpacity(0.5),
+            ],
+          ),
+        ),
+        child: Row(
+          children: [
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '나만의 기록 공간',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2D2D2D),
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    '내가 느낀 감정과 순간을 기록해보세요.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF999999),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            GestureDetector(
+              onTap: () => playClickSound(),
+              child: Container(
+                width: 48,
+                height: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF9C7CB8),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x339C7CB8),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.add, color: Colors.white, size: 24),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  //  7. 하단 네비게이션
+  // ─────────────────────────────────────────────
+  Widget _buildBottomNav() {
+    const tabs = [
+      (Icons.home_rounded, '홈', true),
+      (Icons.auto_awesome, '명리', false),
+      (Icons.edit_note_rounded, '기록', false),
+      (Icons.bar_chart_rounded, '리포트', false),
+      (Icons.more_horiz_rounded, '더보기', false),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              for (final t in tabs)
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => playClickSound(),
+                    behavior: HitTestBehavior.opaque,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          t.$1,
+                          size: 24,
+                          color: t.$3
+                              ? const Color(0xFF9C7CB8)
+                              : const Color(0xFFBBBBBB),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          t.$2,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: t.$3
+                                ? const Color(0xFF9C7CB8)
+                                : const Color(0xFFBBBBBB),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
+// ─────────────────────────────────────────────
+//  오행 막대 위젯 (애니메이션)
+// ─────────────────────────────────────────────
 class _ElementBar extends StatefulWidget {
   final String label;
   final Color color;
@@ -791,7 +841,7 @@ class _ElementBarState extends State<_ElementBar>
           ),
           const SizedBox(width: 8),
           SizedBox(
-            width: 35,
+            width: 34,
             child: AnimatedBuilder(
               animation: _anim,
               builder: (context, _) => Text(
@@ -806,275 +856,6 @@ class _ElementBarState extends State<_ElementBar>
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 섹션 5: 명리 여정
-// ─────────────────────────────────────────────────────────────
-class _Journey extends StatelessWidget {
-  const _Journey();
-
-  @override
-  Widget build(BuildContext context) {
-    const items = [
-      (Icons.person_outline, Color(0xFFEDE7F6), Color(0xFF7E57C2), '나의 성향\n분석'),
-      (Icons.people_outline, Color(0xFFFCE4EC), Color(0xFFE57373), '관계의\n흐름'),
-      (Icons.calendar_today_outlined, Color(0xFFE8F5E9), Color(0xFF66BB6A), '올해의\n운세'),
-      (Icons.assessment_outlined, Color(0xFFE3F2FD), Color(0xFF42A5F5), '운세\n리포트'),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            '명리 여정',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF2D2D2D),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              for (var i = 0; i < items.length; i++) ...[
-                if (i > 0) const SizedBox(width: 10),
-                Expanded(
-                  child: _JourneyCard(
-                    icon: items[i].$1,
-                    bgColor: items[i].$2,
-                    iconColor: items[i].$3,
-                    label: items[i].$4,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _JourneyCard extends StatelessWidget {
-  final IconData icon;
-  final Color bgColor;
-  final Color iconColor;
-  final String label;
-
-  const _JourneyCard({
-    required this.icon,
-    required this.bgColor,
-    required this.iconColor,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => playClickSound(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.7), width: 1),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, size: 24, color: iconColor),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF555555),
-                height: 1.3,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 섹션 6: 나만의 기록 공간
-// ─────────────────────────────────────────────────────────────
-class _RecordSpace extends StatelessWidget {
-  const _RecordSpace();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.6), width: 1),
-          gradient: LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            colors: [
-              Colors.white.withOpacity(0.5),
-              const Color(0xFFF0EAFA).withOpacity(0.5),
-            ],
-          ),
-        ),
-        child: Row(
-          children: [
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '나만의 기록 공간',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF2D2D2D),
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    '내가 느낀 감정과 순간을 기록해보세요.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF999999),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            GestureDetector(
-              onTap: () => playClickSound(),
-              child: Container(
-                width: 48,
-                height: 48,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF9C7CB8),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x339C7CB8),
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.add, color: Colors.white, size: 24),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 하단 네비게이션 바
-// ─────────────────────────────────────────────────────────────
-class _BottomNav extends StatelessWidget {
-  const _BottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    const tabs = [
-      (Icons.home_rounded, '홈', true),
-      (Icons.auto_awesome, '명리', false),
-      (Icons.edit_note_rounded, '기록', false),
-      (Icons.bar_chart_rounded, '리포트', false),
-      (Icons.more_horiz_rounded, '더보기', false),
-    ];
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 20,
-            offset: Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 56,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (final t in tabs)
-                _NavTab(icon: t.$1, label: t.$2, active: t.$3),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavTab extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool active;
-
-  const _NavTab({
-    required this.icon,
-    required this.label,
-    required this.active,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = active ? const Color(0xFF9C7CB8) : const Color(0xFFBBBBBB);
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => playClickSound(),
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
