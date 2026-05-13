@@ -75,13 +75,6 @@ class AppGradients {
     colors: [AppColors.pastelPink, AppColors.pastelPurple, AppColors.pastelBlue],
     stops: [0.0, 0.5, 1.0],
   );
-
-  static const LinearGradient splash = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [AppColors.primary, AppColors.wood, AppColors.accent],
-    stops: [0.0, 0.5, 1.0],
-  );
 }
 
 class AppText {
