@@ -160,30 +160,37 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 320),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: (child, anim) => FadeTransition(
-                        opacity: anim,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0.06, 0),
-                            end: Offset.zero,
-                          ).animate(anim),
-                          child: child,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Center(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 320),
+                            switchInCurve: Curves.easeOutCubic,
+                            switchOutCurve: Curves.easeInCubic,
+                            transitionBuilder: (child, anim) => FadeTransition(
+                              opacity: anim,
+                              child: SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0.06, 0),
+                                  end: Offset.zero,
+                                ).animate(anim),
+                                child: child,
+                              ),
+                            ),
+                            child: _QuestionCard(
+                              key: ValueKey(q.id),
+                              question: q,
+                              selectedDisplayIndex: selectedDisplayIdx,
+                              shuffledOrder: _shuffledOrder[q.id]!,
+                              onTapOption: _selectAndAdvance,
+                              onScaleChanged: _saveAnswer,
+                              onScaleConfirm: _advance,
+                            ),
+                          ),
                         ),
-                      ),
-                      child: _QuestionCard(
-                        key: ValueKey(q.id),
-                        question: q,
-                        selectedDisplayIndex: selectedDisplayIdx,
-                        shuffledOrder: _shuffledOrder[q.id]!,
-                        onTapOption: _selectAndAdvance,
-                        onScaleChanged: _saveAnswer,
-                        onScaleConfirm: _advance,
                       ),
                     ),
                   ),
