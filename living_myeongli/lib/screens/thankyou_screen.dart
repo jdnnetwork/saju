@@ -5,7 +5,7 @@ import '../config/theme.dart';
 import '../models/character.dart';
 import '../utils/sound.dart';
 import '../widgets/glass_card.dart';
-import 'splash_screen.dart';
+import 'intro_screen.dart';
 
 class ThankYouScreen extends StatelessWidget {
   const ThankYouScreen({super.key, required this.topCharacter});
@@ -17,7 +17,7 @@ class ThankYouScreen extends StatelessWidget {
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 500),
-        pageBuilder: (_, _, _) => const SplashScreen(),
+        pageBuilder: (_, _, _) => const IntroScreen(),
         transitionsBuilder: (_, anim, _, child) =>
             FadeTransition(opacity: anim, child: child),
       ),

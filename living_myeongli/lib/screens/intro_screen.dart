@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../services/supabase_service.dart';
 import '../utils/sound.dart';
 import 'result_screen.dart';
 import 'survey_screen.dart';
@@ -34,6 +36,15 @@ class _IntroScreenState extends State<IntroScreen>
     _floatAnimation = Tween<double>(begin: 0.0, end: -16.0).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
     );
+
+    _pingSupabase();
+  }
+
+  Future<void> _pingSupabase() async {
+    try {
+      final svc = SupabaseService(Supabase.instance.client);
+      await svc.ping();
+    } catch (_) {}
   }
 
   @override
