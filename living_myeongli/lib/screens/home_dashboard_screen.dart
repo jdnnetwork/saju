@@ -379,7 +379,6 @@ class HomeDashboardScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(child: _keywordCard()),
           const SizedBox(width: 12),
@@ -391,6 +390,7 @@ class HomeDashboardScreen extends StatelessWidget {
 
   Widget _keywordCard() {
     return Container(
+      height: 200,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
@@ -475,6 +475,7 @@ class HomeDashboardScreen extends StatelessWidget {
     final maxVal = maxRaw > 0 ? maxRaw : 1.0;
 
     return Container(
+      height: 200,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.6),
@@ -573,7 +574,8 @@ class HomeDashboardScreen extends StatelessWidget {
       onTap: () => playClickSound(),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        height: 110,
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.5),
           borderRadius: BorderRadius.circular(16),
@@ -583,16 +585,16 @@ class HomeDashboardScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 44,
-              height: 44,
+              width: 40,
+              height: 40,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, size: 22, color: iconColor),
+              child: Icon(icon, size: 20, color: iconColor),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               label,
               textAlign: TextAlign.center,
